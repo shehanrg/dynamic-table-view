@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import Alamofire
 @testable import DynamicTableView
 
 class DynamicTableViewTests: XCTestCase {
@@ -19,16 +20,22 @@ class DynamicTableViewTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    func testNetworkRequestToReturnStatusCode200() {
+        let url = URL(string: "https://gist.githubusercontent.com/ashwini9241/6e0f26312ddc1e502e9d280806eed8bc/raw/7fab0cf3177f17ec4acd6a2092fc7c0f6bba9e1f/saltside-json-data")!
+        let promise = expectation(description: "Status code: 200")
+        Alamofire.request(url,
+                          method: .get)
+            .validate()
+            .responseJSON { response in
+                if let statusCode = response.response?.statusCode {
+                    if statusCode == 200 {
+                        promise.fulfill();
+                    } else {
+                        XCTFail("Status code: \(statusCode)")
+                    }
+                }
         }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
 }
